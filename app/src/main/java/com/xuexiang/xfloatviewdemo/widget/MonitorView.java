@@ -22,7 +22,7 @@ import android.os.Looper;
 import android.view.View;
 import android.widget.TextView;
 
-import com.xuexiang.xfloatview.XFloatView;
+import com.xiaoyan.xfloatview.XFloatView;
 import com.xuexiang.xfloatviewdemo.R;
 import com.xuexiang.xutil.app.PackageUtils;
 

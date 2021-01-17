@@ -16,7 +16,8 @@
 
 package com.xuexiang.xfloatviewdemo.fragment;
 
-import com.xuexiang.xfloatview.permission.FloatWindowPermission;
+
+import com.xiaoyan.xfloatview.permission.FloatWindowPermission;
 import com.xuexiang.xfloatviewdemo.service.NetWorkMonitorService;
 import com.xuexiang.xpage.annotation.Page;
 import com.xuexiang.xpage.base.XPageSimpleListFragment;

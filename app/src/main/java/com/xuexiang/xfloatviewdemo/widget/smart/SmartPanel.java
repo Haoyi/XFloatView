@@ -21,7 +21,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
 
-import com.xuexiang.xfloatview.XFloatView;
+import com.xiaoyan.xfloatview.XFloatView;
 import com.xuexiang.xfloatviewdemo.R;
 import com.xuexiang.xfloatviewdemo.util.SystemKeyboard;
 import com.xuexiang.xutil.display.DensityUtils;

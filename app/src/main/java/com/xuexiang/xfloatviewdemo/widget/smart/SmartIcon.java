@@ -19,7 +19,7 @@ package com.xuexiang.xfloatviewdemo.widget.smart;
 import android.content.Context;
 import android.widget.ImageView;
 
-import com.xuexiang.xfloatview.XFloatView;
+import com.xiaoyan.xfloatview.XFloatView;
 import com.xuexiang.xfloatviewdemo.R;
 
 /**

@@ -25,7 +25,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.IBinder;
-import android.support.annotation.RequiresApi;
+import androidx.annotation.RequiresApi;
 
 import com.xuexiang.xfloatviewdemo.widget.smart.SmartView;
 

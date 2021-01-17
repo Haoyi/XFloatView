@@ -1,11 +1,11 @@
-package com.xuexiang.xfloatview.permission;
+package com.xiaoyan.xfloatview.permission;
 
 import android.app.Dialog;
 import android.content.Context;
 
 /**
  * 悬浮权限申请提示
- * @author xuexiang
+ * @author xiaoyan
  * @since 2019-09-16 10:27
  */
 public interface IPermissionApplyPrompter {

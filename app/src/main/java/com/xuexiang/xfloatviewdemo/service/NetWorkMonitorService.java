@@ -26,8 +26,8 @@ import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.os.Build;
 import android.os.IBinder;
-import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 
 import com.xuexiang.xfloatviewdemo.widget.MonitorView;
 import com.xuexiang.xutil.data.SPUtils;
