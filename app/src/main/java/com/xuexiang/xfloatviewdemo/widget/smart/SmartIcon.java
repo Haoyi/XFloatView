@@ -22,6 +22,8 @@ import android.widget.ImageView;
 import com.xiaoyan.xfloatview.XFloatView;
 import com.xuexiang.xfloatviewdemo.R;
 
+
+
 /**
  * 悬浮图标
  *

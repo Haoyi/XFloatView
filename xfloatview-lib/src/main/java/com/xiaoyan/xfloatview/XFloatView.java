@@ -2,11 +2,13 @@ package com.xiaoyan.xfloatview;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.PixelFormat;
 import android.os.Build;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
+import android.view.OrientationEventListener;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
@@ -23,11 +25,12 @@ import android.widget.ImageView;
  * @author xiaoyan
  * @since 2018/9/13 上午2:19
  */
-public abstract class XFloatView implements OnTouchListener {
+public abstract class XFloatView extends OrientationEventListener implements
+        OnTouchListener {
 
     private Context mContext;
     /**
-     * 悬浮窗的布局参数
+     * 悬浮窗的布局参数s
      */
     private LayoutParams mWmParams;
     /**
@@ -60,14 +63,11 @@ public abstract class XFloatView implements OnTouchListener {
      * 构造器
      */
     public XFloatView(Context context) {
+        super(context);
         init(context);
-
         initFloatRootView(getLayoutId());
-
         initFloatViewPosition();
-
         initFloatView();
-
         initListener();
     }
 
@@ -140,7 +140,7 @@ public abstract class XFloatView implements OnTouchListener {
         // LayoutParams.FLAG_NOT_TOUCHABLE
         ;
         // 调整悬浮窗显示的停靠位置为左侧置顶
-        params.gravity = Gravity.LEFT | Gravity.TOP;
+        params.gravity = Gravity.START | Gravity.TOP;
         return params;
     }
 
@@ -164,16 +164,14 @@ public abstract class XFloatView implements OnTouchListener {
      * 初始化父布局
      *
      * @param layoutId 布局的资源ID（最好是LinearLayout)
-     * @return
      */
-    private View initFloatRootView(int layoutId) {
+    private void initFloatRootView(int layoutId) {
         //获取浮动窗口视图所在布局
         mFloatRootView = LayoutInflater.from(mContext).inflate(layoutId, null);
         mFloatRootView.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
         if (canMoveOrTouch()) {
             mFloatRootView.setOnTouchListener(this);
         }
-        return mFloatRootView;
     }
 
     /**
@@ -206,6 +204,17 @@ public abstract class XFloatView implements OnTouchListener {
         mWindowManager.updateViewLayout(mFloatRootView, mWmParams);
     }
 
+    /**
+     * 更新悬浮框的大小参数
+     *
+     * @param width
+     * @param height
+     */
+    public void updateViewSize(int width, int height) {
+        mWmParams.width = width;
+        mWmParams.height = height;
+        mWindowManager.updateViewLayout(mFloatRootView, mWmParams);
+    }
     //==========================show/dismiss=============================//
 
     /**
@@ -254,11 +263,9 @@ public abstract class XFloatView implements OnTouchListener {
      * 设置悬浮窗的点击监听
      *
      * @param onClickListener
-     * @return
      */
-    public XFloatView setOnFloatViewClickListener(OnClickListener onClickListener) {
+    public void setOnFloatViewClickListener(OnClickListener onClickListener) {
         mOnClickListener = onClickListener;
-        return this;
     }
 
     /**
@@ -280,10 +287,24 @@ public abstract class XFloatView implements OnTouchListener {
      */
     public void setRotateView(ImageView rotateView, int resId) {
         mRotateView = rotateView;
-        mBitmap = Utils.drawable2Bitmap(mContext.getResources().getDrawable(resId));
+        setViewRes(resId);
         mRotateView.setImageBitmap(mBitmap);
     }
 
+
+    /**
+     * 设置ImageView图片资源
+     *
+     * @param resId      旋转图片资源的id
+     */
+    public void setViewRes(int resId) {
+        mBitmap = BitmapFactory.decodeResource(mContext.getResources(), resId);
+    }
+
+    @Override
+    public void onOrientationChanged(int orientation) {
+
+    }
     //=======================触摸事件===========================//
 
     @Override
@@ -454,7 +475,7 @@ public abstract class XFloatView implements OnTouchListener {
      * @author xiaoyan
      * @since 2018/9/13 上午2:22
      */
-    public final class Location {
+    public static final class Location {
         /**
          * 记录当前手指位置在屏幕上的横坐标
          */

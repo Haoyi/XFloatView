@@ -3,10 +3,10 @@ package com.xiaoyan.xfloatview;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
 import android.graphics.Matrix;
-import android.graphics.PixelFormat;
-import android.graphics.drawable.Drawable;
+import android.widget.ImageView;
+
+import java.lang.reflect.Field;
 
 /**
  * 工具类
@@ -70,21 +70,37 @@ final class Utils {
     }
 
     /**
-     * 将Drawable转化为Bitmap
+     * 获取ImageView的图片资源id
      *
-     * @param drawable Drawable
-     * @return Bitmap
+     * @param imageView 要获取图片资源id的ImageView
+     * @return 获取到的图片资源ID
      */
-    static Bitmap drawable2Bitmap(Drawable drawable) {
-        int width = drawable.getIntrinsicWidth();
-        int height = drawable.getIntrinsicHeight();
-        Bitmap bitmap = Bitmap.createBitmap(width, height, drawable
-                .getOpacity() != PixelFormat.OPAQUE ? Bitmap.Config.ARGB_8888
-                : Bitmap.Config.RGB_565);
-        Canvas canvas = new Canvas(bitmap);
-        drawable.setBounds(0, 0, width, height);
-        drawable.draw(canvas);
-        return bitmap;
+
+    static int getResId(ImageView imageView) {
+        int resId = 0;
+
+        if (imageView==null)
+            return resId;
+
+        Field[] fields=imageView.getClass().getDeclaredFields();
+        for(Field f:fields){
+            if(f.getName().equals("mBackgroundTintHelper")){
+                f.setAccessible(true);
+                try {
+                    Object obj = f.get(imageView);
+                    Field[] fields2=obj.getClass().getDeclaredFields();
+                    for(Field f2:fields2){
+                        if(f2.getName().equals("mBackgroundResId")){
+                            f2.setAccessible(true);
+                            resId = f2.getInt(obj);
+                        }
+                    }
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return resId;
     }
 
 }
