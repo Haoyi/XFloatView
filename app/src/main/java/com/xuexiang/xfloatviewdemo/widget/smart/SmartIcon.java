@@ -48,7 +48,8 @@ public class SmartIcon extends XFloatView {
 
     @Override
     public void initFloatView() {
-        setRotateView((ImageView) findViewById(R.id.ic_show), R.drawable.ic_show_normal);
+        setIconView((ImageView) findViewById(R.id.ic_show));
+        setBackground("selector_btn_smartpoint");
     }
 
     @Override

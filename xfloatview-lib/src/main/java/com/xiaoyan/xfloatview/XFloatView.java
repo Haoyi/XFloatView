@@ -1,9 +1,12 @@
 package com.xiaoyan.xfloatview;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.PixelFormat;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -15,6 +18,8 @@ import android.view.View.OnTouchListener;
 import android.view.WindowManager;
 import android.view.WindowManager.LayoutParams;
 import android.widget.ImageView;
+
+import androidx.core.content.ContextCompat;
 
 /**
  * 悬浮窗基类,实现悬浮窗只需继承该类即可
@@ -50,9 +55,9 @@ public abstract class XFloatView extends OrientationEventListener implements
     private OnClickListener mOnClickListener;
     private OnFloatViewMoveListener mOnFloatViewMoveListener;
     /**
-     * 吸附旋转的控件
+     * 主按钮控件
      */
-    private ImageView mRotateView;
+    private ImageView mIconView;
     private Bitmap mBitmap;
     /**
      * 悬浮窗口是否显示
@@ -242,8 +247,8 @@ public abstract class XFloatView extends OrientationEventListener implements
      */
     public void clear() {
         dismiss();
-        if (mRotateView != null) {
-            mRotateView = null;
+        if (mIconView != null) {
+            mIconView = null;
             if (mBitmap != null) {
                 mBitmap.recycle();
                 mBitmap = null;
@@ -282,23 +287,38 @@ public abstract class XFloatView extends OrientationEventListener implements
     /**
      * 设置需要旋转的ImageView控件
      *
-     * @param rotateView
-     * @param resId      旋转图片资源的id
+     * @param imageView
+     *
      */
-    public void setRotateView(ImageView rotateView, int resId) {
-        mRotateView = rotateView;
-        setViewRes(resId);
-        mRotateView.setImageBitmap(mBitmap);
+    public void setIconView(ImageView imageView) {
+        mIconView = imageView;
     }
 
+    public void setBackground(int resId) {
+        mBitmap = setViewRes(resId);
+        mIconView.setImageBitmap(mBitmap);
+    }
 
+    public void setBackground(Drawable background) {
+        mIconView.setBackground(background);
+    }
+
+    public void setBackground(String str) {
+        Drawable drawable;
+        if (mContext != null) {
+            Resources resources = mContext.getResources();
+            drawable = (BitmapDrawable) ContextCompat.getDrawable(mContext,
+                    resources.getIdentifier(str, "drawable", mContext.getPackageName()));
+            mIconView.setBackground(drawable);
+        }
+    }
     /**
      * 设置ImageView图片资源
      *
      * @param resId      旋转图片资源的id
      */
-    public void setViewRes(int resId) {
-        mBitmap = BitmapFactory.decodeResource(mContext.getResources(), resId);
+    public Bitmap setViewRes(int resId) {
+        return BitmapFactory.decodeResource(mContext.getResources(), resId);
     }
 
     @Override
@@ -405,11 +425,11 @@ public abstract class XFloatView extends OrientationEventListener implements
      * @param degree 角度
      */
     private void updateRotateView(int degree) {
-        if (mRotateView != null) {
+        if (mIconView != null) {
             if (degree != 0) {
-                mRotateView.setImageBitmap(Utils.rotate(mBitmap, degree));
+                mIconView.setImageBitmap(Utils.rotate(mBitmap, degree));
             } else {
-                mRotateView.setImageBitmap(mBitmap);
+                mIconView.setImageBitmap(mBitmap);
             }
         }
     }

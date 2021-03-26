@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "com.xuexiang.xfloatviewdemo"
-        minSdkVersion 14
+        minSdkVersion 16
         targetSdkVersion build_versions.target_sdk
         versionCode 1
         versionName "1.0"
