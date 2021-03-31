@@ -2,17 +2,22 @@ package com.xiaoyan.xfloatview;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.PixelFormat;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
+import android.view.OrientationEventListener;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.view.WindowManager;
 import android.view.WindowManager.LayoutParams;
 import android.widget.ImageView;
+
+import androidx.core.content.ContextCompat;
 
 /**
  * 悬浮窗基类,实现悬浮窗只需继承该类即可
@@ -23,11 +28,12 @@ import android.widget.ImageView;
  * @author xiaoyan
  * @since 2018/9/13 上午2:19
  */
-public abstract class XFloatView implements OnTouchListener {
+public abstract class XFloatView extends OrientationEventListener implements
+        OnTouchListener {
 
     private Context mContext;
     /**
-     * 悬浮窗的布局参数
+     * 悬浮窗的布局参数s
      */
     private LayoutParams mWmParams;
     /**
@@ -47,9 +53,9 @@ public abstract class XFloatView implements OnTouchListener {
     private OnClickListener mOnClickListener;
     private OnFloatViewMoveListener mOnFloatViewMoveListener;
     /**
-     * 吸附旋转的控件
+     * 主按钮控件
      */
-    private ImageView mRotateView;
+    private ImageView mIconView;
     private Bitmap mBitmap;
     /**
      * 悬浮窗口是否显示
@@ -60,14 +66,11 @@ public abstract class XFloatView implements OnTouchListener {
      * 构造器
      */
     public XFloatView(Context context) {
+        super(context);
         init(context);
-
         initFloatRootView(getLayoutId());
-
         initFloatViewPosition();
-
         initFloatView();
-
         initListener();
     }
 
@@ -140,7 +143,7 @@ public abstract class XFloatView implements OnTouchListener {
         // LayoutParams.FLAG_NOT_TOUCHABLE
         ;
         // 调整悬浮窗显示的停靠位置为左侧置顶
-        params.gravity = Gravity.LEFT | Gravity.TOP;
+        params.gravity = Gravity.START | Gravity.TOP;
         return params;
     }
 
@@ -164,16 +167,14 @@ public abstract class XFloatView implements OnTouchListener {
      * 初始化父布局
      *
      * @param layoutId 布局的资源ID（最好是LinearLayout)
-     * @return
      */
-    private View initFloatRootView(int layoutId) {
+    private void initFloatRootView(int layoutId) {
         //获取浮动窗口视图所在布局
         mFloatRootView = LayoutInflater.from(mContext).inflate(layoutId, null);
         mFloatRootView.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
         if (canMoveOrTouch()) {
             mFloatRootView.setOnTouchListener(this);
         }
-        return mFloatRootView;
     }
 
     /**
@@ -206,6 +207,17 @@ public abstract class XFloatView implements OnTouchListener {
         mWindowManager.updateViewLayout(mFloatRootView, mWmParams);
     }
 
+    /**
+     * 更新悬浮框的大小参数
+     *
+     * @param width
+     * @param height
+     */
+    public void updateViewSize(int width, int height) {
+        mWmParams.width = width;
+        mWmParams.height = height;
+        mWindowManager.updateViewLayout(mFloatRootView, mWmParams);
+    }
     //==========================show/dismiss=============================//
 
     /**
@@ -233,8 +245,8 @@ public abstract class XFloatView implements OnTouchListener {
      */
     public void clear() {
         dismiss();
-        if (mRotateView != null) {
-            mRotateView = null;
+        if (mIconView != null) {
+            mIconView = null;
             if (mBitmap != null) {
                 mBitmap.recycle();
                 mBitmap = null;
@@ -254,11 +266,9 @@ public abstract class XFloatView implements OnTouchListener {
      * 设置悬浮窗的点击监听
      *
      * @param onClickListener
-     * @return
      */
-    public XFloatView setOnFloatViewClickListener(OnClickListener onClickListener) {
+    public void setOnFloatViewClickListener(OnClickListener onClickListener) {
         mOnClickListener = onClickListener;
-        return this;
     }
 
     /**
@@ -275,15 +285,43 @@ public abstract class XFloatView implements OnTouchListener {
     /**
      * 设置需要旋转的ImageView控件
      *
-     * @param rotateView
-     * @param resId      旋转图片资源的id
+     * @param imageView
+     *
      */
-    public void setRotateView(ImageView rotateView, int resId) {
-        mRotateView = rotateView;
-        mBitmap = Utils.drawable2Bitmap(mContext.getResources().getDrawable(resId));
-        mRotateView.setImageBitmap(mBitmap);
+    public void setIconView(ImageView imageView) {
+        mIconView = imageView;
     }
 
+    public void setBackground(int resId) {
+        mBitmap = setViewRes(resId);
+        mIconView.setImageBitmap(mBitmap);
+    }
+
+    public void setBackground(Drawable background) {
+        mIconView.setBackground(background);
+    }
+
+    public void setBackground(String str) {
+        Drawable drawable;
+        if (mContext != null) {
+            drawable = ContextCompat.getDrawable(mContext,
+                    mContext.getResources().getIdentifier(str,"drawable",mContext.getPackageName()));
+            mIconView.setBackground(drawable);
+        }
+    }
+    /**
+     * 设置ImageView图片资源
+     *
+     * @param resId      旋转图片资源的id
+     */
+    public Bitmap setViewRes(int resId) {
+        return BitmapFactory.decodeResource(mContext.getResources(), resId);
+    }
+
+    @Override
+    public void onOrientationChanged(int orientation) {
+
+    }
     //=======================触摸事件===========================//
 
     @Override
@@ -384,11 +422,11 @@ public abstract class XFloatView implements OnTouchListener {
      * @param degree 角度
      */
     private void updateRotateView(int degree) {
-        if (mRotateView != null) {
+        if (mIconView != null) {
             if (degree != 0) {
-                mRotateView.setImageBitmap(Utils.rotate(mBitmap, degree));
+                mIconView.setImageBitmap(Utils.rotate(mBitmap, degree));
             } else {
-                mRotateView.setImageBitmap(mBitmap);
+                mIconView.setImageBitmap(mBitmap);
             }
         }
     }
@@ -454,7 +492,7 @@ public abstract class XFloatView implements OnTouchListener {
      * @author xiaoyan
      * @since 2018/9/13 上午2:22
      */
-    public final class Location {
+    public static final class Location {
         /**
          * 记录当前手指位置在屏幕上的横坐标
          */

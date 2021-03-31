@@ -19,13 +19,13 @@ package com.xuexiang.xfloatviewdemo.service;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Build;
-import android.os.IBinder;
+
 import androidx.annotation.RequiresApi;
+import androidx.lifecycle.LifecycleService;
 
 import com.xuexiang.xfloatviewdemo.widget.smart.SmartView;
 
@@ -37,13 +37,20 @@ import java.util.Objects;
  * @author xuexiang
  * @since 2018/9/13 下午2:31
  */
-public class SmartViewService extends Service {
+public class SmartViewService extends LifecycleService {
+    private SmartViewObserver mSmartViewObserver;
 
     private SmartView mSmartView;
 
     private static boolean isRunning = false;
 
     public static final String CHANNEL_ID = "SmartView";
+
+
+    public SmartViewService(){
+        mSmartViewObserver = new SmartViewObserver();
+        getLifecycle().addObserver(mSmartViewObserver);
+    }
 
     /**
      * 开启
@@ -72,15 +79,15 @@ public class SmartViewService extends Service {
         }
     }
 
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
-
-    @Override
-    public boolean onUnbind(Intent intent) {
-        return super.onUnbind(intent);
-    }
+//    @Override
+//    public IBinder onBind(Intent intent) {
+//        return null;
+//    }
+//
+//    @Override
+//    public boolean onUnbind(Intent intent) {
+//        return super.onUnbind(intent);
+//    }
 
     /**
      * 判断服务是否运行
