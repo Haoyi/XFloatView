@@ -451,6 +451,7 @@ public abstract class XFloatView extends OrientationEventListener implements
 
     public void setWmParams(LayoutParams wmParams) {
         this.mWmParams = wmParams;
+        mWindowManager.updateViewLayout(mFloatRootView, mWmParams);
     }
 
     public WindowManager getWindowManager() {
